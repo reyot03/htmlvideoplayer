@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" lang="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Play Downloading Video</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #222;
+        }
+
+        video, #timeDuration {
+            margin:0;
+        }
+
+        #videoContainer, #buttonbar {
+            display: block;
+            margin: auto;
+            width: 75%;
+        }
+
+        #videoContainer {
+            margin-top: 15px;
+        }
+
+        #video_player {
+            width: 100%;
+            height: 80vh;
+            max-width: 100vw;
+            max-height: 80vh;
+        }
+
+        #timeDuration {
+            color: #fff;
+            text-align: center;
+            margin: 10px;
+        }
+
+        #buttonbar {
+            display: flex;
+            align-items: center;
+          justify-content: center;
+
+        }
+
+        #buttonbar * {
+            margin: 5px;
+            width: 85px;
+        }
+
+        label {
+            color: #fff;
+        }
+
+        #playerContainer {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<label for="video_file">Choose the video from here</label><br>
+<input type="file" name="client-file" id="video_file" onchange="load_video()">
+<div id="playerContainer">
+    <div id="videoContainer">
+        <video id="video_player" controls onloadeddata="showDuration()">
+           <source id="source" src="" type="video/mp4">
+        </video>
+    </div>
+    <div id="timeDuration">
+        <span id="current_time"></span>/<span id="duration"></span>
+    </div>
+    <div id="buttonbar">
+        <button id="restart" onclick="restart();">⨉</button> 
+        <button id="rew" onclick="skip(-10)">⪡</button>
+        <button id="play" onclick="vidplay()">⩿⪀</button>
+        <button id="fastFwd" onclick="skip(10)">⪢</button>
+    </div> 
+</div>
+</body>
+
+<script>
+    function load_video(){
+        source.src = URL.createObjectURL(event.target.files[0]);
+        video_player.load();
+        // video_player.play();
+        document.querySelector('#playerContainer').style.display = 'block';
+        theVideo.focus();
+    }
+    var theVideo = document.getElementById("video_player");
+    document.onkeydown = function (event){
+        
+        console.log("key pressed"+event.keyCode);
+        if (event.target == theVideo){
+            return;
+        }
+        event.preventDefault();
+        const seekTime = 10;
+        switch (event.keyCode) {
+            case 37:  
+                  var currentTime = theVideo.currentTime;
+                  theVideo.currentTime = currentTime - seekTime;
+                console.log("in 37");
+                break;
+             
+             case 39:
+                   var currentTime = theVideo.currentTime;
+                  theVideo.currentTime = currentTime + seekTime;
+                  console.log("in 39")
+                break;
+            case 32:
+                if (theVideo.paused) {
+                    console.log("played");
+                    theVideo.play();
+                }
+                else {
+                    console.log("paused");
+                    theVideo.pause();
+                }
+        }
+    };
+</script>
+<script>
+    function formatTime(timeInSeconds) {
+        const result = new Date(timeInSeconds * 1000).toISOString().substr(11, 8);
+        return result;
+    }
+    current_time = document.getElementById("current_time");
+    function showDuration(){
+        duration = document.getElementById("duration");
+        const videoDuration = Math.floor(theVideo.duration);
+        const time = formatTime(videoDuration);
+        duration.innerText = time;
+    }
+    theVideo.addEventListener("timeupdate", (event) => {
+        current_time.textContent = formatTime(Math.floor(theVideo.currentTime));
+
+    });
+        function vidplay() {
+       var button = document.getElementById("play");
+       if (theVideo.paused) {
+          theVideo.play();
+          button.textContent = "||";
+       } else {
+          theVideo.pause();
+          button.textContent = ">";
+       }
+    }
+
+    function restart() {
+        theVideo.currentTime = 0;
+    }
+
+    function skip(value) {
+        theVideo.currentTime += value;
+    }    
+</script>
+</html>
